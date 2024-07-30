@@ -82,5 +82,16 @@ if uploaded_file is not None:
     price_col = st.selectbox('Select the price-like column', data.columns)
     area_col = st.selectbox('Select the area-like column', data.columns)
 
+    # User input for filtering specific values from the selected columns
+    st.write('Select specific values for filtering:')
+    price_values = st.multiselect(f'Select values from {price_col}', data[price_col].unique())
+    area_values = st.multiselect(f'Select values from {area_col}', data[area_col].unique())
+
+    # Apply filtering based on selected values
+    if price_values:
+        data = data[data[price_col].isin(price_values)]
+    if area_values:
+        data = data[data[area_col].isin(area_values)]
+
     # Visualize data
     visualize_data(data, price_col, area_col)
