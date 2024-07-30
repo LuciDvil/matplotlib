@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import io
 
 # Function to load data and create visualizations
-def visualize_data(data, price_col=None, area_col=None):
+def visualize_data(data, price_col=None, area_col=None, selected_plots=[]):
     # Display basic information about the dataset
     st.write("### Dataset Information")
     buffer = io.StringIO()
@@ -32,27 +32,45 @@ def visualize_data(data, price_col=None, area_col=None):
     # Drop rows where either of the columns has NaN values
     filtered_data = data.dropna(subset=[price_col, area_col])
 
-    # Visualize the data
-    st.write(f'### Histogram of {price_col}')
-    fig, ax = plt.subplots()
-    ax.hist(filtered_data[price_col], bins=30, edgecolor='black')
-    ax.set_xlabel(price_col)
-    ax.set_ylabel('Frequency')
-    st.pyplot(fig)
+    # Visualize the data based on selected plots
+    if 'Histogram' in selected_plots:
+        st.write(f'### Histogram of {price_col}')
+        fig, ax = plt.subplots()
+        ax.hist(filtered_data[price_col], bins=30, edgecolor='black')
+        ax.set_xlabel(price_col)
+        ax.set_ylabel('Frequency')
+        st.pyplot(fig)
 
-    st.write(f'### {area_col} vs {price_col}')
-    fig, ax = plt.subplots()
-    ax.scatter(filtered_data[area_col], filtered_data[price_col], alpha=0.5)
-    ax.set_xlabel(area_col)
-    ax.set_ylabel(price_col)
-    st.pyplot(fig)
+    if f'{area_col} vs {price_col}' in selected_plots:
+        st.write(f'### {area_col} vs {price_col}')
+        fig, ax = plt.subplots()
+        ax.scatter(filtered_data[area_col], filtered_data[price_col], alpha=0.5)
+        ax.set_xlabel(area_col)
+        ax.set_ylabel(price_col)
+        st.pyplot(fig)
 
-    st.write(f'### {price_col} Trend')
-    fig, ax = plt.subplots()
-    ax.plot(filtered_data[price_col].sort_values().values)
-    ax.set_xlabel('Index')
-    ax.set_ylabel(price_col)
-    st.pyplot(fig)
+    if f'{price_col} Trend' in selected_plots:
+        st.write(f'### {price_col} Trend')
+        fig, ax = plt.subplots()
+        ax.plot(filtered_data[price_col].sort_values().values)
+        ax.set_xlabel('Index')
+        ax.set_ylabel(price_col)
+        st.pyplot(fig)
+
+    if 'Box Plot' in selected_plots:
+        st.write(f'### Box Plot of {price_col}')
+        fig, ax = plt.subplots()
+        ax.boxplot(filtered_data[price_col])
+        ax.set_ylabel(price_col)
+        st.pyplot(fig)
+
+    if 'Line Plot' in selected_plots:
+        st.write(f'### Line Plot of {price_col}')
+        fig, ax = plt.subplots()
+        ax.plot(filtered_data[price_col])
+        ax.set_xlabel('Index')
+        ax.set_ylabel(price_col)
+        st.pyplot(fig)
 
 @st.cache_data
 def load_data(file):
@@ -93,5 +111,10 @@ if uploaded_file is not None:
     if area_values:
         data = data[data[area_col].isin(area_values)]
 
+    # User input for selecting which plots to display
+    st.write('Select plots to display:')
+    plot_options = ['Histogram', f'{area_col} vs {price_col}', f'{price_col} Trend', 'Box Plot', 'Line Plot']
+    selected_plots = st.multiselect('Select plots', plot_options)
+
     # Visualize data
-    visualize_data(data, price_col, area_col)
+    visualize_data(data, price_col, area_col, selected_plots)
