@@ -85,25 +85,24 @@ if uploaded_file is not None:
     # Read the uploaded file
     data = load_data(uploaded_file)
 
-    # Display the first few rows of the dataset
-    st.write("### First Few Rows of the Dataset")
-    st.write(data.head())
+    # Sidebar for user inputs
+    st.sidebar.title("Filter and Visualization Options")
 
     # User input for number of records to fetch
-    num_records = st.slider('Number of records to fetch', min_value=10, max_value=len(data), value=50, step=10)
+    num_records = st.sidebar.slider('Number of records to fetch', min_value=10, max_value=len(data), value=50, step=10)
 
     # Limit the data to the specified number of records
     data = data.head(num_records)
 
     # User input for column selection
-    st.write('Select columns for visualizations:')
-    price_col = st.selectbox('Select the price-like column', data.columns)
-    area_col = st.selectbox('Select the area-like column', data.columns)
+    st.sidebar.write('Select columns for visualizations:')
+    price_col = st.sidebar.selectbox('Select the price-like column', data.columns)
+    area_col = st.sidebar.selectbox('Select the area-like column', data.columns)
 
     # User input for filtering specific values from the selected columns
-    st.write('Select specific values for filtering:')
-    price_values = st.multiselect(f'Select values from {price_col}', data[price_col].unique())
-    area_values = st.multiselect(f'Select values from {area_col}', data[area_col].unique())
+    st.sidebar.write('Select specific values for filtering:')
+    price_values = st.sidebar.multiselect(f'Select values from {price_col}', data[price_col].unique())
+    area_values = st.sidebar.multiselect(f'Select values from {area_col}', data[area_col].unique())
 
     # Apply filtering based on selected values
     if price_values:
@@ -112,9 +111,13 @@ if uploaded_file is not None:
         data = data[data[area_col].isin(area_values)]
 
     # User input for selecting which plots to display
-    st.write('Select plots to display:')
+    st.sidebar.write('Select plots to display:')
     plot_options = ['Histogram', f'{area_col} vs {price_col}', f'{price_col} Trend', 'Box Plot', 'Line Plot']
-    selected_plots = st.multiselect('Select plots', plot_options)
+    selected_plots = st.sidebar.multiselect('Select plots', plot_options)
 
     # Visualize data
     visualize_data(data, price_col, area_col, selected_plots)
+
+    # Display the first few rows of the dataset
+    st.write("### First Few Rows of the Dataset")
+    st.write(data.head())
